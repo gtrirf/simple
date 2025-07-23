@@ -102,12 +102,12 @@ class StaffAttendanceAdmin(admin.ModelAdmin):
             path(
                 'attendance-report/',
                 self.attendance_report_view,
-                name='admin:staff_attendance_attendance_report'
+                name='attendance_report'
             ),
             path(
                 'attendance-report/<int:user_id>/',
                 self.user_attendance_detail,
-                name='admin:staff_attendance_user_attendance_detail'
+                name='user_attendance_detail'
             ),
         ]
         return custom_urls + urls
@@ -130,7 +130,7 @@ class StaffAttendanceAdmin(admin.ModelAdmin):
             'site_header': admin.site.site_header,
             'has_permission': True,
         }
-        return TemplateResponse(request, 'admin/attendance_report.html', context)
+        return render(request, 'admin/attendance_report.html', context)
 
     def user_attendance_detail(self, request, user_id):
         user = get_object_or_404(CustomUser, id=user_id)
@@ -157,7 +157,7 @@ class StaffAttendanceAdmin(admin.ModelAdmin):
             'has_permission': True,
             'timezone': timezone,  # Template uchun timezone obyekti
         }
-        return TemplateResponse(request, 'admin/user_attendance_detail.html', context)
+        return render(request, 'admin/user_attendance_detail.html', context)
 
     def calculate_status_times(self, records):
         if not records.exists():

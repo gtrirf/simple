@@ -76,7 +76,7 @@
     {% for user in users %}
     <div class="user-card">
         <div class="username">
-            <a href="{% url 'admin:staff_attendance_user_attendance_detail' user_id=user.id %}">
+            <a href="/admin/todo/staff_attendance/attendance-report/{{ user.id }}/">
                 {{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}
             </a>
         </div>

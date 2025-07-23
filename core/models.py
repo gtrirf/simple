@@ -41,7 +41,7 @@ class Leads(TimeBase):
     fullname = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
     branches = models.CharField(max_length=100, choices=Branches, default=Branches.KRUG)
-    models.ForeignKey(CourseName, on_delete=models.SET_NULL, null=True, blank=True)
+    course = models.ForeignKey(CourseName, on_delete=models.SET_NULL, null=True, blank=True)
     is_online = models.BooleanField(default=False)
     is_offline =models.BooleanField(default=False)
     is_agree = models.BooleanField(default=False)
