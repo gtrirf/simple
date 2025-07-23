@@ -1,3 +1,4 @@
+from core.models import TimeBase, CustomUser
 from course.models import CourseName
 from django.db import models
 from django.contrib.auth import get_user_model
@@ -124,3 +125,32 @@ class Task(models.Model):
 
     class Meta:
         ordering = ['-created_at']
+
+
+class TaskComment(TimeBase):
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user = models.ForeignKey(CustomUser, on_delete=models.SET_NULL, null=True, blank=True)
+    comment = models.TextField()
+
+    def __str__(self):
+        return f"{self.user.fullname} {self.task.title}"
+
+
+class Staff_attendance(TimeBase):
+    objects = None
+
+    class StatusChoices(models.TextChoices):
+        IN_CLASS = 'in_class', _("📘 Darsda")
+        ON_LUNCH = 'on_lunch', _('🍽 Tushlikda')
+        NOT_AT_OFFICE = 'not_at_office', _("🏠 Ishda emas")
+        AVAILABLE = 'available', _("✅ Ishda")
+        BUSY = 'busy', _('🔴 Band')
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    status = models.CharField(
+        max_length=20,
+        choices=StatusChoices.choices,
+        default=StatusChoices.AVAILABLE,
+    )
+
+    def __str__(self):
+        return self.user.username

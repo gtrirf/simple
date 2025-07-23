@@ -4,19 +4,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 class CustomUser(AbstractUser):
-    class StatusChoices(models.TextChoices):
-        IN_CLASS = 'in_class', _("Darsda")
-        ON_LUNCH = 'on_lunch', _('Tushlikda')
-        NOT_AT_OFFICE = 'not_at_office', _("Ishda emas")
-        AVAILABLE = 'available', _("Ishda")
-        BUSY = 'busy', _('Band')
-
     telegram_id = models.BigIntegerField(unique=True, null=True, blank=True)
-    status = models.CharField(
-        max_length=20,
-        choices=StatusChoices.choices,
-        default=StatusChoices.AVAILABLE,
-    )
 
     def __str__(self):
         return self.username

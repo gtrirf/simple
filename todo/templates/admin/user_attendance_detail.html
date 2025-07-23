@@ -1,0 +1,212 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<style>
+    .attendance-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .user-info {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+    .user-avatar {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: #f0f0f0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        margin-right: 20px;
+        color: #666;
+    }
+    .user-details h2 {
+        margin: 0 0 5px 0;
+    }
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+    }
+    .stat-card {
+        background: #f8f8f8;
+        border-radius: 4px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .stat-card h3 {
+        margin-top: 0;
+        color: #666;
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+    .stat-value {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+    .status-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+    .status-table th,
+    .status-table td {
+        padding: 10px;
+        text-align: left;
+        border-bottom: 1px solid #eee;
+    }
+    .status-table th {
+        background-color: #f8f8f8;
+        font-weight: bold;
+    }
+    .status-badge {
+        display: inline-block;
+        padding: 3px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    .status-available {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    .status-in_class {
+        background-color: #cce5ff;
+        color: #004085;
+    }
+    .status-busy {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    .status-on_lunch {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    .status-not_at_office {
+        background-color: #d6d8db;
+        color: #383d41;
+    }
+    .back-link {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 8px 15px;
+        background: #f0f0f0;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    .back-link:hover {
+        background: #e0e0e0;
+        color: #333;
+    }
+    .no-data {
+        text-align: center;
+        color: #666;
+        font-style: italic;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="attendance-header">
+    <h1>{{ title }}</h1>
+    <div class="date-info">
+        <strong>Sana:</strong> {{ today|date:"d F Y" }}
+    </div>
+</div>
+
+<div class="user-info">
+    <div class="user-avatar">
+        {% firstof user.first_name|first user.username|first "?" %}{% firstof user.last_name|first "" %}
+    </div>
+    <div class="user-details">
+        <h2>{{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}</h2>
+        <p>@{{ user.username }}</p>
+    </div>
+</div>
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <h3>Umumiy ish vaqti</h3>
+        <div class="stat-value">{{ status_times.total_work|default:"0:00:00" }}</div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Dars berish vaqti</h3>
+        <div class="stat-value">{{ status_times.in_class|default:"0:00:00" }}</div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Bandlik vaqti</h3>
+        <div class="stat-value">{{ status_times.busy|default:"0:00:00" }}</div>
+    </div>
+
+    <div class="stat-card">
+        <h3>Abetgan vaqt</h3>
+        <div class="stat-value">{{ status_times.total_away|default:"0:00:00" }}</div>
+    </div>
+</div>
+
+<h3>Status o'zgarishlari tarixi</h3>
+<table class="status-table">
+    <thead>
+        <tr>
+            <th>Vaqt</th>
+            <th>Holat</th>
+            <th>Izoh</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.created_at|time:"H:i:s" }}</td>
+            <td>
+                <span class="status-badge status-{{ record.status }}">
+                    {{ record.get_status_display }}
+                </span>
+            </td>
+            <td>
+                {% if forloop.first %}
+                    Ish boshlanishi
+                {% elif forloop.last %}
+                    {{ record.created_at|timesince }} oldin o'zgartirilgan
+                {% else %}
+                    Status o'zgartirildi
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr>
+            <td colspan="3" class="no-data">Bugun hech qanday ma'lumot topilmadi</td>
+        </tr>
+        {% endfor %}
+
+        {% if records %}
+        <tr style="border-top: 2px solid #ddd;">
+            <td><strong>{{ timezone.now|time:"H:i:s" }}</strong></td>
+            <td>
+                <span class="status-badge status-{{ records.last.status }}">
+                    Joriy holat: {{ records.last.get_status_display }}
+                </span>
+            </td>
+            <td>
+                <strong>{{ records.last.created_at|timesince }} davom etmoqda</strong>
+            </td>
+        </tr>
+        {% endif %}
+    </tbody>
+</table>
+
+<a href="{% url 'admin:staff_attendance_attendance_report' %}" class="back-link">← Orqaga</a>
+{% endblock %}

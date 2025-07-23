@@ -1,0 +1,94 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+<style>
+    .attendance-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eaeaea;
+    }
+    .user-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 15px;
+        margin-top: 20px;
+    }
+    .user-card {
+        background: #f8f8f8;
+        border-radius: 4px;
+        padding: 15px;
+        text-align: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: all 0.3s ease;
+    }
+    .user-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        background: #eef7ff;
+    }
+    .user-card a {
+        text-decoration: none;
+        color: #333;
+        font-weight: bold;
+    }
+    .user-card .username {
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .user-card .status {
+        font-size: 12px;
+        color: #666;
+    }
+    .date-info {
+        font-size: 14px;
+        color: #666;
+    }
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+        border-radius: 4px;
+    }
+    .alert-info {
+        color: #31708f;
+        background-color: #d9edf7;
+        border-color: #bce8f1;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="attendance-header">
+    <h1>{{ title }}</h1>
+    <div class="date-info">
+        <strong>Sana:</strong> {{ today|date:"d F Y" }}
+    </div>
+</div>
+
+{% if users %}
+<div class="user-grid">
+    {% for user in users %}
+    <div class="user-card">
+        <div class="username">
+            <a href="{% url 'admin:staff_attendance_user_attendance_detail' user_id=user.id %}">
+                {{ user.first_name|default:user.username }} {{ user.last_name|default:"" }}
+            </a>
+        </div>
+        <div class="status">
+            @{{ user.username }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="alert alert-info">
+    Bugun hech qanday davomat ma'lumotlari topilmadi.
+</div>
+{% endif %}
+{% endblock %}

@@ -7,11 +7,10 @@ from .models import CustomUser, Statistics
 class CustomUserAdmin(UserAdmin):
     fieldsets = UserAdmin.fieldsets + (
         ('Telegram Info', {
-            'fields': ('telegram_id', 'status'),
+            'fields': ['telegram_id'],
         }),
     )
-    list_display = ('username', 'email', 'telegram_id', 'status', 'is_staff')
-    list_filter = ('status',)
+    list_display = ('username', 'email', 'telegram_id', 'is_staff')
 
 
 @admin.register(Statistics)
