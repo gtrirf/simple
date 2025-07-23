@@ -1,0 +1,90 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+<style>
+  .report-section {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 20px;
+    margin-left:30px;
+    margin-bottom: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  }
+  .report-section h2 {
+    margin-top: 0;
+    font-size: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 5px;
+    margin-bottom: 15px;
+  }
+  .report-form {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 30px;
+  }
+  .report-form input[type="date"] {
+    padding: 6px 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+  }
+  .report-form button {
+    padding: 6px 14px;
+    background-color: #0c4b33;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .report-form button:hover {
+    background-color: #0a3f2a;
+  }
+</style>
+
+<h1 style="margin-bottom: 25px;">📊 Hisobotlar</h1>
+
+<form method="get" class="report-form">
+  <label for="from">📆 Boshlanish sanasi:</label>
+  <input type="date" id="from" name="from" value="{{ from_date }}">
+
+  <label for="to">📆 Tugash sanasi:</label>
+  <input type="date" id="to" name="to" value="{{ to_date }}">
+
+  <button type="submit">Filter</button>
+</form>
+
+{% if today %}
+<div class="report-section">
+  <h2>📅 Bugungi statistika</h2>
+  <ul>
+    <li>Guruhlar soni: <strong>{{ today.total_groups }}</strong></li>
+    <li>O‘quvchilar soni: <strong>{{ today.total_students }}</strong></li>
+    <li>Dars qoldirganlar: <strong>{{ today.total_absent }}</strong></li>
+    <li>Jami tashriflar: <strong>{{ today.visitor_data.total }}</strong></li>
+    <li>Yangi mijozlar: <strong>{{ today.visitor_data.new }}</strong></li>
+    <li>O‘quvchilar: <strong>{{ today.visitor_data.student }}</strong></li>
+    <li>Ota-onalar: <strong>{{ today.visitor_data.parent }}</strong></li>
+    <li>Boshqa: <strong>{{ today.visitor_data.other }}</strong></li>
+  </ul>
+</div>
+{% endif %}
+
+{% if filtered %}
+<div class="report-section">
+  <h2>📆 {{ filtered.from }} - {{ filtered.to }} statistikasi</h2>
+  <ul>
+    <li>Guruhlar soni: <strong>{{ filtered.total_groups }}</strong></li>
+    <li>O‘quvchilar soni: <strong>{{ filtered.total_students }}</strong></li>
+    <li>Dars qoldirganlar: <strong>{{ filtered.total_absent }}</strong></li>
+    <li>Jami tashriflar: <strong>{{ filtered.visitor_data.total }}</strong></li>
+    <li>Yangi mijozlar: <strong>{{ filtered.visitor_data.new }}</strong></li>
+    <li>O‘quvchilar: <strong>{{ filtered.visitor_data.student }}</strong></li>
+    <li>Ota-onalar: <strong>{{ filtered.visitor_data.parent }}</strong></li>
+    <li>Boshqa: <strong>{{ filtered.visitor_data.other }}</strong></li>
+  </ul>
+</div>
+{% endif %}
+
+{% endblock %}

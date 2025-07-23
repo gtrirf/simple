@@ -1,0 +1,6 @@
+/* Jazzmin login sahifadagi logo uchun styling */
+.login-logo img {
+    max-height: 100px !important;
+    width: auto !important;
+    object-fit: contain;
+}
