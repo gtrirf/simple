@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404
 from .serializers import CourseListSerializers, AboutCourseSerializer, CourseLearningPointSerializer, \
     CourseStatisticSerializer, StudentCertificateSerializers
 from .models import AboutCourse, CourseStatistic, Course, CourseLearningPoint, StudentsCertificates
+from rest_framework.permissions import AllowAny
+from django.db.models import Q
+
 
 class CourseListView(APIView):
     def get(self, request):
@@ -47,11 +50,35 @@ class CourseStatisticView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 class StudentCertificatesView(APIView):
-    permission_classes = [IsAuthenticated]
+
     def get(self, request):
-        certificate = get_object_or_404(StudentsCertificates)
-        serializers = StudentCertificateSerializers(certificate, many=True)
-        return Response(serializers.data, status=status.HTTP_200_OK)
+        full_name = request.GET.get('full_name')
+        certificate_id = request.GET.get('certificate_id')
+
+        filters = {}
+
+        if full_name:
+            try:
+                first_name, last_name = full_name.strip().split(' ', 1)
+                filters['first_name__iexact'] = first_name.strip()
+                filters['last_name__iexact'] = last_name.strip()
+            except ValueError:
+                return Response({"error": "To‘liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
+
+        if certificate_id:
+            filters['certificate_id__iexact'] = certificate_id.strip()
+
+        if not filters:
+            return Response({"error": "Kamida full_name yoki certificate_id kerak"}, status=status.HTTP_400_BAD_REQUEST)
+
+        certificate = StudentsCertificates.objects.filter(**filters).first()
+
+        if not certificate:
+            return Response({"error": "Sertifikat topilmadi"}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = StudentCertificateSerializers(certificate)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
 
 class StudentCertificateView(APIView):
     def get(self, request, uuid):

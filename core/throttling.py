@@ -11,6 +11,10 @@ class LeadPostThrottle(SimpleRateThrottle):
         return self.get_ident(request)
 
     def allow_request(self, request, view):
+        self.key = self.get_cache_key(request, view)
+        if self.key is None:
+            return True
+
         ip = self.get_ident(request)
         blocked = cache.get(f"blocked:{ip}")
         if blocked:
