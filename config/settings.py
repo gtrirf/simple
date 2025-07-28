@@ -104,7 +104,7 @@ SQLITE_DB_CONF = {
 }
 
 DATABASES = {
-    'default': SQLITE_DB_CONF,
+    'default': POSTGRES_DB_CONF,
 
 }
 
