@@ -11,7 +11,12 @@ SECRET_KEY = env('SECRET_KEY')
 
 DEBUG = env('DEBUG').lower() == 'true'
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    "127.0.0.1",
+    "localhost",
+    "simple-gwyq.onrender.com",
+    "devops-itc.alwaysdata.net",
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -37,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -71,12 +77,12 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://127.0.0.1:8000",
-    "https://simple-gwyq.onrender.com"
+    "https://simple-gwyq.onrender.com",
+    "https://devops-itc.alwaysdata.net",
 ]
 CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://127.0.0.1:8000',
-    "https://simple-gwyq.onrender.com"
+    "https://simple-gwyq.onrender.com",
+    "https://devops-itc.alwaysdata.net",
 ]
 CORS_ALLOW_METHODS = [
     "DELETE",
@@ -258,6 +264,8 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 STATICFILES_DIRS = [
     BASE_DIR / "static",
 ]
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
+
 # MEDIA FILES
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
