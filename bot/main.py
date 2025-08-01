@@ -158,7 +158,6 @@ async def show_tasks(message: types.Message):
         ])
 
         await message.answer(text, parse_mode=ParseMode.HTML, reply_markup=markup)
-        return None
     return None
 
 
