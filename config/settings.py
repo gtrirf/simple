@@ -16,6 +16,8 @@ ALLOWED_HOSTS = [
     "localhost",
     "simple-gwyq.onrender.com",
     "devops-itc.alwaysdata.net",
+    "devops-itcenter.netlify.app",
+    "devops-itcenter.uz",
 ]
 
 # Application definition
@@ -79,10 +81,14 @@ CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
     "https://simple-gwyq.onrender.com",
     "https://devops-itc.alwaysdata.net",
+    "https://devops-itcenter.netlify.app",
+    "https://devops-itcenter.uz"
 ]
 CSRF_TRUSTED_ORIGINS = [
     "https://simple-gwyq.onrender.com",
     "https://devops-itc.alwaysdata.net",
+    "https://devops-itcenter.netlify.app",
+    "https://devops-itcenter.uz",
 ]
 CORS_ALLOW_METHODS = [
     "DELETE",
