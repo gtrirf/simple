@@ -360,10 +360,12 @@ async def send_task_reminders():
 
                 text = (
                     f"🔔 <b>Vazifa eslatmasi</b>\n\n"
-                    f"📌 {task.title}\n"
-                    f"📝 {task.description or ''}\n"
+                    f"<b>📌 {task.title}</b>\n"
+                    f"📝 {task.description or 'Tavsif mavjud emas'}\n"
                     f"⏳ Deadline: {task.due_date.strftime('%Y-%m-%d') if task.due_date else 'Muddatsiz'}\n"
-                    f"{PRIORITY_ICONS.get(task.priority, '🟡')} {task.get_priority_display()}"
+                    f"{PRIORITY_ICONS.get(task.priority, '🟡')} {task.get_priority_display()}\n"
+                    f"🔄 {task.get_repetition_display()}\n"
+                    f"📍 Holati: {task.get_status_display()}"
                 )
 
                 markup = InlineKeyboardMarkup(inline_keyboard=[
