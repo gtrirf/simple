@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from apps.students.models import CourseName  # to‘g‘ri path yoz
+from course.models import CourseName  # to‘g‘ri path yoz
 
 class Command(BaseCommand):
     help = 'Automatically generates CourseName entries'
