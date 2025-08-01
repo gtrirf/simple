@@ -1,8 +1,9 @@
 import asyncio
+import re
 from datetime import datetime, time, date, timedelta
 from aiogram import Bot, Dispatcher, types
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, Message, ForceReply
 from aiogram.enums.parse_mode import ParseMode
 from aiogram.filters import CommandStart, Command
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -222,7 +223,10 @@ async def handle_task_action(callback: types.CallbackQuery):
         return
 
     if action == "task_comment":
-        await callback.message.answer(f"Izohingizni yuboring (vazifa ID: {task_id}):")
+        await callback.message.answer(
+            f"Izohingizni yuboring (vazifa ID: {task_id}):",
+            reply_markup=ForceReply(selective=True)
+        )
         await callback.answer()
         return
 
@@ -242,6 +246,27 @@ async def handle_task_action(callback: types.CallbackQuery):
             parse_mode=ParseMode.HTML
         )
     await callback.answer()
+
+@dp.message()
+async def handle_comments(message: types.Message):
+    user = await get_user(message.from_user.id)
+    if not user or not message.text or not message.reply_to_message:
+        return
+
+    text0 = message.reply_to_message.text or ""
+    # regex yordamida faqat raqamlarni olamiz
+    match = re.search(r"vazifa ID[: ]+(\d+)", text0)
+    if not match:
+        return  # ID topilmasa chetga chiq
+    task_id = int(match.group(1))
+
+    try:
+        await create_comment(task_id, user.id, message.text)
+        await message.answer("✅ Izohingiz qo‘shildi!")
+    except Exception as e:
+        # real xatoni log qil, foydalanuvchiga oddiy habar
+        print(f"[CommentError] {e}")
+        await message.answer("❌ Izoh qo‘shishda xatolik yuz berdi.")
 
 
 @dp.callback_query(lambda c: c.data.startswith("checkin"))
@@ -285,7 +310,7 @@ async def handle_comments(message: types.Message):
 async def send_daily_checkin():
     while True:
         now = localtime(dj_now()).time()
-        if now.hour == 9 and now.minute == 0:  # At 9:00 AM
+        if now.hour == 8 and now.minute == 0:  # At 9:00 AM
             users = await sync_to_async(list)(User.objects.exclude(telegram_id__isnull=True))
 
             for user in users:
@@ -345,6 +370,10 @@ async def send_task_reminders():
                     [
                         InlineKeyboardButton(text="✅ Bajarildi", callback_data=f"task_done:{task.id}"),
                         InlineKeyboardButton(text="🚧 Jarayonda", callback_data=f"task_progress:{task.id}"),
+                    ],
+                    [
+                        InlineKeyboardButton(text="❌ Bekor qilish", callback_data=f"task_cancel:{task.id}"),
+                        InlineKeyboardButton(text="💬 Izoh qoldirish", callback_data=f"task_comment:{task.id}"),
                     ]
                 ])
 

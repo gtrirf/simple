@@ -162,7 +162,7 @@ JAZZMIN_SETTINGS = {
     "site_title": "Admin Dashboard",
     "site_header": "devops itc admin panel",
     "site_brand": "Devops it center",
-    "site_logo": "images/dpslogo2.png",
+    "site_logo": "images/dpslogo2.PNG",
     "site_icon": "images/dpslogo3.png",
     "site_logo_classes": "img-circle elevation-3",
     "custom_css": "css/admin_style.css",
@@ -193,6 +193,8 @@ JAZZMIN_SETTINGS = {
         "todo.VisitorLog":"fa-solid fa-street-view",
         "todo.Rooms":"fa-solid fa-door-open",
         "todo.Task":"fa-solid fa-list-check",
+        "todo.Staff_attendance":"fa-solid fa-clipboard-user",
+        "todo.TaskComment":"fa-solid fa-comments"
     },
     "show_ui_builder": False,
 }

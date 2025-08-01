@@ -133,7 +133,8 @@ class TaskComment(TimeBase):
     comment = models.TextField()
 
     def __str__(self):
-        return f"{self.user.fullname} {self.task.title}"
+        uname = getattr(self.user, 'fullname', None) or getattr(self.user, 'username', 'Unknown user')
+        return f"{uname} – {self.task.title}"
 
 
 class Staff_attendance(TimeBase):
@@ -154,3 +155,6 @@ class Staff_attendance(TimeBase):
 
     def __str__(self):
         return self.user.username
+
+    class Meta:
+        verbose_name = "Staff Attendance"

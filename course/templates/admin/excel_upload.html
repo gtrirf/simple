@@ -1,10 +1,23 @@
 {% extends "admin/base_site.html" %}
+{% load static %}
+
 {% block content %}
-
-    <h2>Excel faylni yuklang</h2>
-    <form method="post" enctype="multipart/form-data">{% csrf_token %}
+  <div style="max-width: 500px; margin: 40px auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 0 15px rgba(0,0,0,0.1);">
+    <h2 style="margin-bottom: 20px; font-weight: bold; color: #2c3e50;">📥 Excel faylni yuklang</h2>
+    <form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit" class="default">Yuklash</button>
+      <button type="submit" style="
+        background-color: #28a745;
+        border: none;
+        padding: 10px 20px;
+        color: white;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+      ">
+        Yuklash
+      </button>
     </form>
-
+  </div>
 {% endblock %}

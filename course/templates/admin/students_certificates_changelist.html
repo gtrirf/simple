@@ -1,5 +1,9 @@
 {% extends "admin/change_list.html" %}
-{% block object-tools-items %}
-  <li><a href="import-excel/" class="addlink">Excel import qilish</a></li>
-  {{ block.super }}
+{% block object-tools %}
+  <div class="object-tools btn-group">
+    <a href="import-excel/" class="btn btn-sm btn-primary">
+      <i class="fas fa-file-excel"></i> Excel import qilish
+    </a>
+    {{ block.super }}
+  </div>
 {% endblock %}

@@ -1,6 +1,13 @@
 {% extends "admin/change_list.html" %}
-{% block object-tools-items %}
-    <li><a href="custom-report/" class="addlink">Xisobotlarni ko'rish</a></li>
-    <li><a href="/admin/todo/staff_attendance/attendance-report/" class="addlink">Ichilar Davomati</a></li>
+
+{% block object-tools %}
+  <div class="object-tools btn-group">
+    <a href="custom-report/" class="btn btn-sm btn-primary">
+      <i class="fas fa-chart-bar"></i> Xisobotlarni ko‘rish
+    </a>
+    <a href="/admin/todo/staff_attendance/attendance-report/" class="btn btn-sm btn-info">
+      <i class="fas fa-user-check"></i> Ichilar Davomati
+    </a>
     {{ block.super }}
+  </div>
 {% endblock %}

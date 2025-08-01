@@ -1,6 +1,6 @@
 from datetime import date
 from django.contrib import admin
-from .models import Attendance, Teacher, Guruhlar, VisitorLog, Rooms, Task, Staff_attendance
+from .models import Attendance, Teacher, Guruhlar, VisitorLog, Rooms, Task, Staff_attendance, TaskComment
 from django.contrib import admin, messages
 from django.urls import path
 from django.template.response import TemplateResponse
@@ -224,3 +224,9 @@ class StaffAttendanceAdmin(admin.ModelAdmin):
         formatted_times['total_away'] = formatted_times['not_at_office']
 
         return formatted_times
+
+@admin.register(TaskComment)
+class TaskCommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'task', 'comment']
+    list_filter = ['user']
+    search_fields = ['comment', 'task'] 
