@@ -41,6 +41,13 @@ class CourseDetailSerializer(serializers.ModelSerializer):
 
 
 class StudentCertificateSerializers(serializers.ModelSerializer):
+    course_name = serializers.SerializerMethodField()
+
     class Meta:
         model = StudentsCertificates
-        fields = "__all__"
+        fields = ['id', 'first_name', 'last_name', "url_uuid", 'course_name', 'certificate_id', 'certificate_url']
+
+    def get_course_name(self, obj):
+        if obj.course_name:
+            return obj.course_name.name  # yoki obj.course_name.title
+        return "Course not assigned"  #

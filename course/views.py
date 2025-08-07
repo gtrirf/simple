@@ -49,29 +49,64 @@ class CourseStatisticView(APIView):
         serializer = CourseStatisticSerializer(point, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+
 class StudentCertificatesView(APIView):
 
     def get(self, request):
         full_name = request.GET.get('full_name')
         certificate_id = request.GET.get('certificate_id')
 
-        filters = {}
-
-        if full_name:
-            try:
-                first_name, last_name = full_name.strip().split(' ', 1)
-                filters['first_name__iexact'] = first_name.strip()
-                filters['last_name__iexact'] = last_name.strip()
-            except ValueError:
-                return Response({"error": "To‘liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
-
-        if certificate_id:
-            filters['certificate_id__iexact'] = certificate_id.strip()
-
-        if not filters:
+        # Ikkisi ham berilmagan holat
+        if not full_name and not certificate_id:
             return Response({"error": "Kamida full_name yoki certificate_id kerak"}, status=status.HTTP_400_BAD_REQUEST)
 
-        certificate = StudentsCertificates.objects.filter(**filters).first()
+        certificate = None
+
+        # Faqat full_name berilgan holat
+        if full_name and not certificate_id:
+            try:
+                first_name, last_name = full_name.strip().split(' ', 1)
+                certificate = StudentsCertificates.objects.filter(
+                    first_name__iexact=first_name.strip(),
+                    last_name__iexact=last_name.strip()
+                ).first()
+            except ValueError:
+                return Response({"error": "To'liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Faqat certificate_id berilgan holat
+        elif certificate_id and not full_name:
+            certificate = StudentsCertificates.objects.filter(
+                certificate_id__iexact=certificate_id.strip()
+            ).first()
+
+        # Ikkisi ham berilgan holat
+        else:
+            try:
+                first_name, last_name = full_name.strip().split(' ', 1)
+
+                # Avval certificate_id bo'yicha qidiramiz
+                cert_by_id = StudentsCertificates.objects.filter(
+                    certificate_id__iexact=certificate_id.strip()
+                ).first()
+
+                # Agar certificate_id bo'yicha topilsa
+                if cert_by_id:
+                    # Ism-familya ham mos kelishini tekshiramiz
+                    if (cert_by_id.first_name.lower() == first_name.strip().lower() and
+                            cert_by_id.last_name.lower() == last_name.strip().lower()):
+                        certificate = cert_by_id
+                    else:
+                        # ID to'g'ri lekin ism-familya xato - natija chiqmasin
+                        certificate = None
+                else:
+                    # Certificate_id xato bo'lsa, ism-familyaga mos certificate qidiramiz
+                    certificate = StudentsCertificates.objects.filter(
+                        first_name__iexact=first_name.strip(),
+                        last_name__iexact=last_name.strip()
+                    ).first()
+
+            except ValueError:
+                return Response({"error": "To'liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not certificate:
             return Response({"error": "Sertifikat topilmadi"}, status=status.HTTP_404_NOT_FOUND)
