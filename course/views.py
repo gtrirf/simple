@@ -53,12 +53,12 @@ class CourseStatisticView(APIView):
 class StudentCertificatesView(APIView):
 
     def get(self, request):
-        full_name = request.GET.get('full_name')
+        full_name = request.GET.get('fullname')
         certificate_id = request.GET.get('certificate_id')
 
         # Ikkisi ham berilmagan holat
         if not full_name and not certificate_id:
-            return Response({"error": "Kamida full_name yoki certificate_id kerak"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Kamida fullname yoki certificate_id kerak"}, status=status.HTTP_400_BAD_REQUEST)
 
         certificate = None
 
