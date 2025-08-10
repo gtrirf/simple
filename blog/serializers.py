@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Blog, BlogImage
+from .models import Blog, BlogImage, BlogType
 
 
 class BlogImageSerializer(serializers.ModelSerializer):
@@ -9,6 +9,10 @@ class BlogImageSerializer(serializers.ModelSerializer):
 
 class BlogSerializer(serializers.ModelSerializer):
     images = BlogImageSerializer(many=True, read_only=True)
+    type = serializers.SlugRelatedField(
+        slug_field='typename',
+        queryset=BlogType.objects.all()
+    )
 
     class Meta:
         model = Blog
