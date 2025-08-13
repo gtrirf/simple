@@ -50,69 +50,60 @@ class CourseStatisticView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+from django.db.models import Q
+
 class StudentCertificatesView(APIView):
 
     def get(self, request):
         full_name = request.GET.get('fullname')
         certificate_id = request.GET.get('certificate_id')
 
-        # Ikkisi ham berilmagan holat
         if not full_name and not certificate_id:
             return Response({"error": "Kamida fullname yoki certificate_id kerak"}, status=status.HTTP_400_BAD_REQUEST)
 
         certificate = None
+        part1 = part2 = None
 
-        # Faqat full_name berilgan holat
-        if full_name and not certificate_id:
-            try:
-                first_name, last_name = full_name.strip().split(' ', 1)
-                certificate = StudentsCertificates.objects.filter(
-                    first_name__iexact=first_name.strip(),
-                    last_name__iexact=last_name.strip()
-                ).first()
-            except ValueError:
+        if full_name:
+            parts = full_name.strip().split(' ', 1)
+            if len(parts) != 2:
                 return Response({"error": "To'liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
+            part1, part2 = parts[0].strip(), parts[1].strip()
 
-        # Faqat certificate_id berilgan holat
-        elif certificate_id and not full_name:
+        # Faqat certificate_id
+        if certificate_id and not full_name:
             certificate = StudentsCertificates.objects.filter(
                 certificate_id__iexact=certificate_id.strip()
             ).first()
 
-        # Ikkisi ham berilgan holat
-        else:
-            try:
-                first_name, last_name = full_name.strip().split(' ', 1)
+        # Faqat fullname
+        elif full_name and not certificate_id:
+            certificate = StudentsCertificates.objects.filter(
+                (Q(first_name__iexact=part1) & Q(last_name__iexact=part2)) |
+                (Q(first_name__iexact=part2) & Q(last_name__iexact=part1))
+            ).first()
 
-                # Avval certificate_id bo'yicha qidiramiz
-                cert_by_id = StudentsCertificates.objects.filter(
-                    certificate_id__iexact=certificate_id.strip()
+        # Ikkalasi ham berilgan
+        elif certificate_id and full_name:
+            # 1️⃣ Avval ID bo‘yicha qidiramiz
+            certificate = StudentsCertificates.objects.filter(
+                certificate_id__iexact=certificate_id.strip()
+            ).first()
+
+            # 2️⃣ Agar ID bo‘yicha topilmasa, fullname orqali ikkala tartibda qidiramiz
+            if not certificate:
+                certificate = StudentsCertificates.objects.filter(
+                    (Q(first_name__iexact=part1) & Q(last_name__iexact=part2)) |
+                    (Q(first_name__iexact=part2) & Q(last_name__iexact=part1))
                 ).first()
-
-                # Agar certificate_id bo'yicha topilsa
-                if cert_by_id:
-                    # Ism-familya ham mos kelishini tekshiramiz
-                    if (cert_by_id.first_name.lower() == first_name.strip().lower() and
-                            cert_by_id.last_name.lower() == last_name.strip().lower()):
-                        certificate = cert_by_id
-                    else:
-                        # ID to'g'ri lekin ism-familya xato - natija chiqmasin
-                        certificate = None
-                else:
-                    # Certificate_id xato bo'lsa, ism-familyaga mos certificate qidiramiz
-                    certificate = StudentsCertificates.objects.filter(
-                        first_name__iexact=first_name.strip(),
-                        last_name__iexact=last_name.strip()
-                    ).first()
-
-            except ValueError:
-                return Response({"error": "To'liq ism-familya kiriting"}, status=status.HTTP_400_BAD_REQUEST)
 
         if not certificate:
             return Response({"error": "Sertifikat topilmadi"}, status=status.HTTP_404_NOT_FOUND)
 
         serializer = StudentCertificateSerializers(certificate)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 
 
 class StudentCertificateView(APIView):
