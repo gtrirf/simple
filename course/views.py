@@ -85,13 +85,25 @@ class StudentCertificatesView(APIView):
 
         # Ikkalasi ham berilgan
         elif certificate_id and full_name:
-            # 1️⃣ Avval ID bo‘yicha qidiramiz
-            certificate = StudentsCertificates.objects.filter(
+            # Avval ID bo‘yicha qidiramiz
+            cert_by_id = StudentsCertificates.objects.filter(
                 certificate_id__iexact=certificate_id.strip()
             ).first()
 
-            # 2️⃣ Agar ID bo‘yicha topilmasa, fullname orqali ikkala tartibda qidiramiz
-            if not certificate:
+            if cert_by_id:
+                # ID topilgan bo‘lsa, fullname ham mos bo‘lishi kerak
+                if (
+                        (
+                            cert_by_id.first_name.lower() == part1.lower() and cert_by_id.last_name.lower() == part2.lower()) or
+                        (
+                            cert_by_id.first_name.lower() == part2.lower() and cert_by_id.last_name.lower() == part1.lower())
+                ):
+                    certificate = cert_by_id
+                else:
+                    # ID to‘g‘ri, lekin ism-familya mos emas → natija yo‘q
+                    certificate = None
+            else:
+                # ID topilmasa fullname bo‘yicha ikkala tartibda qidiramiz
                 certificate = StudentsCertificates.objects.filter(
                     (Q(first_name__iexact=part1) & Q(last_name__iexact=part2)) |
                     (Q(first_name__iexact=part2) & Q(last_name__iexact=part1))
